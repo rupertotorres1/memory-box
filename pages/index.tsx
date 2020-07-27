@@ -1,6 +1,6 @@
-import React from 'react';
-import Head from 'next/Head';
-import Achievements from '../components/Achievements';
+import React from "react";
+import Head from "next/head";
+import Achievements from "../components/Achievements";
 
 const Home = () => {
   return (
