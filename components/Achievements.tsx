@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState, FormEvent } from 'react';
+import React, { ChangeEvent, useState, FormEvent } from "react";
 import {
   Button as MaterialButton,
   IconButton,
@@ -6,17 +6,18 @@ import {
   TextField,
   Container as MaterialContainer,
   InputAdornment,
-} from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
-import { styled } from '@material-ui/core/styles';
-import useSWR from 'swr';
-import { apiPost, apiDelete } from '../fetchHelpers';
-import theme from './theme';
+} from "@material-ui/core";
+import AddIcon from "@material-ui/icons/Add";
+import { styled } from "@material-ui/core/styles";
+import useSWR, { responseInterface } from "swr";
+import { apiPost, apiDelete } from "../fetchHelpers";
+import theme from "./theme";
+import { Achievement } from "../types";
 
 const Container = styled(MaterialContainer)({
   marginTop: theme.spacing(2),
-  textAlign: 'center',
-  maxWidth: '900px',
+  textAlign: "center",
+  maxWidth: "900px",
 });
 
 const Heading = styled(Typography)({
@@ -28,34 +29,52 @@ const Body = styled(Typography)({
 });
 
 const Button = styled(MaterialButton)({
-  display: 'block',
-  margin: theme.spacing(0, 'auto', 4, 'auto'),
+  display: "block",
+  margin: theme.spacing(0, "auto", 4, "auto"),
 });
 
-const AddIconButton = () => (
-  <IconButton type="submit">
-    <AddIcon />
-  </IconButton>
-);
+type AchievementsState = {
+  queue: Achievement[];
+  displayedAchievement: Achievement | undefined;
+};
+
+type GetAchievementsResponse = {
+  achievements: Achievement[];
+};
 
 const Achievements = () => {
-  const [achievementsState, setAchievementsState] = useState({
-    queue: [],
-    displayedAchievement: undefined,
+  const [newAchievementInput, setnewAchievementInput] = useState("");
+
+  const [achievementsState, setAchievementsState] = useState<AchievementsState>(
+    {
+      queue: [],
+      displayedAchievement: undefined,
+    }
+  );
+
+  const resetQueue = (achievements: Achievement[]): AchievementsState => ({
+    displayedAchievement: achievements[achievements.length - 1],
+    queue: achievements.slice(0, -1),
   });
 
-  const [newAchievementInput, setnewAchievementInput] = useState('');
-
-  const { data, mutate, error } = useSWR('/api/users/1/achievements', {
-    revalidateOnFocus: false,
-    onSuccess: (data) => {
-      console.log('TEST');
-      setAchievementsState({
-        displayedAchievement: data.achievements[data.achievements.length - 1],
-        queue: data.achievements.slice(0, -1),
-      });
-    },
+  const advanceQueue = (previousQueue: Achievement[]): AchievementsState => ({
+    displayedAchievement: previousQueue[previousQueue.length - 1],
+    queue: previousQueue.slice(0, -1),
   });
+
+  const {
+    data,
+    mutate,
+    error,
+  }: responseInterface<GetAchievementsResponse, any> = useSWR(
+    "/api/users/1/achievements",
+    {
+      revalidateOnFocus: false,
+      onSuccess: (data) => {
+        setAchievementsState(resetQueue(data.achievements));
+      },
+    }
+  );
 
   const handleNewAchievementInput = (e: ChangeEvent) => {
     const target = e.target as HTMLTextAreaElement;
@@ -64,17 +83,20 @@ const Achievements = () => {
 
   const handleAddAchievement = async (e: FormEvent) => {
     e.preventDefault();
+    if (!newAchievementInput) return;
 
-    const newAchievement = await apiPost('api/users/1/achievements', {
+    const newAchievement = await apiPost("api/users/1/achievements", {
       text: newAchievementInput,
     });
     mutate({ achievements: [...data.achievements, newAchievement] }, false);
 
     setAchievementsState((prev) => ({
       ...prev,
-      queue: [newAchievement, ...prev.queue],
+      displayedAchievement: prev.displayedAchievement
+        ? prev.displayedAchievement
+        : newAchievement,
     }));
-    setnewAchievementInput('');
+    setnewAchievementInput("");
   };
 
   const handleDeleteAchievement = async (id: string) => {
@@ -88,38 +110,43 @@ const Achievements = () => {
       false
     );
 
-    setAchievementsState((prev) => ({
-      displayedAchievement: prev.queue[prev.queue.length - 1],
-      queue: prev.queue.slice(0, -1),
-    }));
+    setAchievementsState((prev) => advanceQueue(prev.queue));
   };
 
   const handleShowNext = () => {
-    setAchievementsState((prev) => ({
-      displayedAchievement: prev.queue[prev.queue.length - 1],
-      queue:
-        prev.queue.length === 1 ? data.achievements : prev.queue.slice(0, -1),
-    }));
+    setAchievementsState((prev) =>
+      prev.queue.length === 0
+        ? resetQueue(data.achievements)
+        : advanceQueue(prev.queue)
+    );
   };
 
-  console.log(achievementsState);
+  const { displayedAchievement } = achievementsState;
 
   return (
     <Container>
       <Heading variant="h2">Here's one of your achievements:</Heading>
       {data ? (
-        <Body
-          variant="body1"
-          onClick={() =>
-            handleDeleteAchievement(achievementsState.displayedAchievement.id)
-          }
-        >
-          {achievementsState.displayedAchievement.text}
-        </Body>
+        displayedAchievement ? (
+          <Body
+            variant="body1"
+            onClick={() =>
+              handleDeleteAchievement(achievementsState.displayedAchievement.id)
+            }
+          >
+            {achievementsState.displayedAchievement.text}
+          </Body>
+        ) : (
+          <Body>Add your first achievement below!</Body>
+        )
       ) : (
-        <div>...loading</div>
+        <Body>...loading</Body>
       )}
-      <Button variant="contained" onClick={handleShowNext}>
+      <Button
+        variant="contained"
+        onClick={handleShowNext}
+        disabled={!displayedAchievement}
+      >
         Show me another one
       </Button>
       <form onSubmit={handleAddAchievement}>
@@ -130,7 +157,9 @@ const Achievements = () => {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <AddIconButton />
+                <IconButton type="submit" disabled={!data}>
+                  <AddIcon />
+                </IconButton>
               </InputAdornment>
             ),
           }}
