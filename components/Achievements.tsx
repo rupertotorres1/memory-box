@@ -13,6 +13,7 @@ import useSWR, { responseInterface } from "swr";
 import { apiPost, apiDelete } from "../fetchHelpers";
 import theme from "./theme";
 import { Achievement } from "../types";
+import useLoginRedirect from "./useLoginRedirect";
 
 const Container = styled(MaterialContainer)({
   marginTop: theme.spacing(2),
@@ -122,6 +123,9 @@ const Achievements = () => {
   };
 
   const { displayedAchievement } = achievementsState;
+
+  const sessionLoading = useLoginRedirect();
+  if (sessionLoading) return null;
 
   return (
     <Container>
