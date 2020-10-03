@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ObjectId } from "mongodb";
+import jwt from "next-auth/jwt";
 import database from "../../../../../database";
 
 type DeleteQuery = {
@@ -7,6 +8,11 @@ type DeleteQuery = {
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const token = await jwt.getToken({ req, secret: process.env.SECRET });
+  if (!token) {
+    res.status(401).json({});
+  }
+
   const db = await database();
 
   switch (req.method) {
