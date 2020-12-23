@@ -16,6 +16,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const db = await database();
 
   switch (req.method) {
+    // TODO: only delete if they are the owner
     case "DELETE": {
       const { achievementId } = req.query as DeleteQuery;
 

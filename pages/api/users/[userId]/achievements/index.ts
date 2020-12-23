@@ -15,7 +15,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   switch (req.method) {
     case "GET": {
-      const dbRes = await db.collection("achievements").find().toArray();
+      const dbRes = await db
+        .collection("achievements")
+        .find({ userEmail: token["email"] })
+        .toArray();
       const achievements = dbRes.map(
         (item) => ({ id: item._id.toString(), text: item.text } as Achievement)
       );
@@ -27,7 +30,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "POST": {
       const { text } = req.body as PostBody;
 
-      const dbRes = await db.collection("achievements").insertOne({ text });
+      const dbRes = await db
+        .collection("achievements")
+        .insertOne({ text, userEmail: token["email"] });
       const newAchievement: Achievement = {
         id: dbRes.insertedId.toString(),
         text,
