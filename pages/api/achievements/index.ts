@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import database from "../../../../../backendUtils/database";
-import withAuth from "../../../../../backendUtils/middleware/withAuth";
-import { Achievement } from "../../../../../types";
+import database from "../../../backendUtils/database";
+import withAuth from "../../../backendUtils/middleware/withAuth";
+import { Achievement } from "../../../types";
 
 type PostBody = { text: string };
 

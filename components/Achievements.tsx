@@ -68,7 +68,7 @@ const Achievements = () => {
     mutate,
     error,
   }: responseInterface<GetAchievementsResponse, any> = useSWR(
-    "/api/users/1/achievements",
+    "/api/achievements",
     {
       revalidateOnFocus: false,
       onSuccess: (data) => {
@@ -86,7 +86,7 @@ const Achievements = () => {
     e.preventDefault();
     if (!newAchievementInput) return;
 
-    const newAchievement = await apiPost("api/users/1/achievements", {
+    const newAchievement = await apiPost("api/achievements", {
       text: newAchievementInput,
     });
     mutate({ achievements: [...data.achievements, newAchievement] }, false);
@@ -101,7 +101,7 @@ const Achievements = () => {
   };
 
   const handleDeleteAchievement = async (id: string) => {
-    await apiDelete(`api/users/1/achievements/${id}`);
+    await apiDelete(`api/achievements/${id}`);
     mutate(
       {
         achievements: data.achievements.filter(

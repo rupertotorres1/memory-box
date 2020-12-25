@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ObjectId } from "mongodb";
-import database from "../../../../../backendUtils/database";
-import withAuth from "../../../../../backendUtils/middleware/withAuth";
+import database from "../../../backendUtils/database";
+import withAuth from "../../../backendUtils/middleware/withAuth";
 
 type DeleteQuery = {
   achievementId: string;
