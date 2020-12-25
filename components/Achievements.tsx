@@ -11,9 +11,9 @@ import AddIcon from "@material-ui/icons/Add";
 import { styled } from "@material-ui/core/styles";
 import useSWR, { responseInterface } from "swr";
 import { apiPost, apiDelete } from "../frontendUtils/fetchHelpers";
-import theme from "./theme";
+import theme from "../frontendUtils/theme";
 import { Achievement } from "../types";
-import useLoginRedirect from "./useLoginRedirect";
+import useSession from "../frontendUtils/hooks/useSession";
 
 const Container = styled(MaterialContainer)({
   marginTop: theme.spacing(2),
@@ -124,7 +124,7 @@ const Achievements = () => {
 
   const { displayedAchievement } = achievementsState;
 
-  const sessionLoading = useLoginRedirect();
+  const [session, sessionLoading] = useSession();
   if (sessionLoading) return null;
 
   return (

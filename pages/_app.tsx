@@ -4,7 +4,7 @@ import { SWRConfig } from "swr";
 import { Provider as AuthProvider } from "next-auth/client";
 import { ThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import theme from "../components/theme";
+import theme from "../frontendUtils/theme";
 
 export const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
