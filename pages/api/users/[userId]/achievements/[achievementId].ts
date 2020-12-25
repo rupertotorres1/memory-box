@@ -1,18 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ObjectId } from "mongodb";
-import jwt from "next-auth/jwt";
-import database from "../../../../../database";
+import database from "../../../../../backendUtils/database";
+import withAuth from "../../../../../backendUtils/middleware/withAuth";
 
 type DeleteQuery = {
   achievementId: string;
 };
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const token = await jwt.getToken({ req, secret: process.env.SECRET });
-  if (!token) {
-    res.status(401).json({});
-  }
-
+const handler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  authToken: object
+) => {
   const db = await database();
 
   switch (req.method) {
@@ -29,3 +28,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
   }
 };
+
+export default withAuth(handler);

@@ -10,7 +10,7 @@ import {
 import AddIcon from "@material-ui/icons/Add";
 import { styled } from "@material-ui/core/styles";
 import useSWR, { responseInterface } from "swr";
-import { apiPost, apiDelete } from "../fetchHelpers";
+import { apiPost, apiDelete } from "../frontendUtils/fetchHelpers";
 import theme from "./theme";
 import { Achievement } from "../types";
 import useLoginRedirect from "./useLoginRedirect";

@@ -1,23 +1,22 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import jwt from "next-auth/jwt";
-import database from "../../../../../database";
+import database from "../../../../../backendUtils/database";
+import withAuth from "../../../../../backendUtils/middleware/withAuth";
 import { Achievement } from "../../../../../types";
 
 type PostBody = { text: string };
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const token = await jwt.getToken({ req, secret: process.env.SECRET });
-  if (!token) {
-    res.status(401).json({});
-  }
-
+const handler = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  authToken: object
+) => {
   const db = await database();
 
   switch (req.method) {
     case "GET": {
       const dbRes = await db
         .collection("achievements")
-        .find({ userEmail: token["email"] })
+        .find({ userEmail: authToken["email"] })
         .toArray();
       const achievements = dbRes.map(
         (item) => ({ id: item._id.toString(), text: item.text } as Achievement)
@@ -32,7 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       const dbRes = await db
         .collection("achievements")
-        .insertOne({ text, userEmail: token["email"] });
+        .insertOne({ text, userEmail: authToken["email"] });
       const newAchievement: Achievement = {
         id: dbRes.insertedId.toString(),
         text,
@@ -43,3 +42,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
   }
 };
+
+export default withAuth(handler);
