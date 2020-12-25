@@ -1,6 +1,6 @@
 import React from "react";
 import Head from "next/head";
-import Achievements from "../components/Achievements";
+import Memories from "../components/Memories";
 
 const Home = () => {
   return (
@@ -9,7 +9,7 @@ const Home = () => {
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Achievements />
+      <Memories />
     </div>
   );
 };

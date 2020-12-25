@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import database from "../../../backendUtils/database";
 import withAuth from "../../../backendUtils/middleware/withAuth";
-import { Achievement } from "../../../types";
+import { Memory } from "../../../types";
 
 type PostBody = { text: string };
 
@@ -15,14 +15,14 @@ const handler = async (
   switch (req.method) {
     case "GET": {
       const dbRes = await db
-        .collection("achievements")
+        .collection("memories")
         .find({ userEmail: authToken["email"] })
         .toArray();
-      const achievements = dbRes.map(
-        (item) => ({ id: item._id.toString(), text: item.text } as Achievement)
+      const memories = dbRes.map(
+        (item) => ({ id: item._id.toString(), text: item.text } as Memory)
       );
 
-      res.status(200).json({ achievements });
+      res.status(200).json({ memories });
       break;
     }
 
@@ -30,14 +30,14 @@ const handler = async (
       const { text } = req.body as PostBody;
 
       const dbRes = await db
-        .collection("achievements")
+        .collection("memories")
         .insertOne({ text, userEmail: authToken["email"] });
-      const newAchievement: Achievement = {
+      const newMemory: Memory = {
         id: dbRes.insertedId.toString(),
         text,
       };
 
-      res.status(200).json(newAchievement);
+      res.status(200).json(newMemory);
       break;
     }
   }

@@ -4,7 +4,7 @@ import database from "../../../backendUtils/database";
 import withAuth from "../../../backendUtils/middleware/withAuth";
 
 type DeleteQuery = {
-  achievementId: string;
+  memoryId: string;
 };
 
 const handler = async (
@@ -17,10 +17,10 @@ const handler = async (
   switch (req.method) {
     // TODO: only delete if they are the owner
     case "DELETE": {
-      const { achievementId } = req.query as DeleteQuery;
+      const { memoryId } = req.query as DeleteQuery;
 
-      db.collection("achievements").deleteOne({
-        _id: new ObjectId(achievementId),
+      db.collection("memories").deleteOne({
+        _id: new ObjectId(memoryId),
       });
 
       res.status(200).json({});
